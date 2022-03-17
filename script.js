@@ -3,9 +3,9 @@ const displayValue = document.querySelector(".display");
 const specialChars = document.querySelectorAll(".special");
 let num1 = "";
 let num2 = "";
-
 let special = "a"
 let operator = "a"
+let result = 0
 for (let button of buttons) {
     button.addEventListener("click", () => {
         displayValue.textContent += button.textContent;
@@ -21,16 +21,30 @@ function checkSpecial() {
                 if (special != "C" && special != "=") {
                     storeData()
                     displayValue.textContent = ""
-                    console.log({ special })
-                    special = "a"
                 } else if (special == "=") {
                     storeData()
-                    displayValue.textContent = operate(+num1, operator, +num2)
-                }
+                    displayValue.textContent = calculate()
+                } else clearData()
             }
 
         }
     }
+}
+
+function calculate() {
+    result = operate(+num1, operator, +num2)
+    return result;
+}
+
+function clearData() {
+    if (special == "C") {
+        num1 = ""
+    } else num1 = result
+    num2 = "";
+    special = "a"
+    operator = "a"
+    result = 0
+    displayValue.textContent = ""
 }
 
 function storeData() {
@@ -40,6 +54,7 @@ function storeData() {
     } else if (num2 === "") {
         num2 = displayValue.textContent.slice(0, -1)
     }
+    special = "a";
 }
 
 function operate(num1, operator, num2) {
