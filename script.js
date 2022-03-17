@@ -1,3 +1,13 @@
+let buttons = document.querySelectorAll(".button");
+let displayValue = document.querySelector(".display")
+console.log(buttons)
+for (let button of buttons) {
+    button.addEventListener("click", () => {
+        displayValue.textContent += button.textContent;
+    })
+}
+
+
 function operate(num1, operator, num2) {
     if (operator == "+") {
         return add(num1, num2);
