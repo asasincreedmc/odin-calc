@@ -12,6 +12,48 @@ let result = 0
 let placeholder = ""
 let wasCalculated = false
 let calcError = false
+
+window.addEventListener("keyup", (e) => {
+    let key = checkKey(e)
+    console.log(e.key)
+    if (key == "undefined") {
+
+    } else if (key == "+" || key == "-" || key == "*" || key == "/" || key == "=" || key == "C") {
+        evaluateChar(key)
+    } else if (key >= 0 && key <= 9) {
+        if (!calcError) {
+            if (willOperate) {
+                displayValue = ""
+                special = "a"
+                willOperate = false
+            }
+            placeholder = key;
+            changeDisplay()
+        }
+    }
+
+})
+
+function checkKey(e) {
+    for (let char of specialButtons) {
+        char = char.textContent
+        if (e.key == char) {
+            return char;
+        }
+    }
+    if (e.key == "Enter") {
+        return "="
+    }
+    if (e.code == "Delete") {
+        return "C"
+    }
+    for (let number of numberButtons) {
+        if (e.code == (`Numpad${number.textContent}`) || e.code == (`Digit${number.textContent}`)) {
+            return number.textContent
+        }
+    }
+}
+
 for (let button of numberButtons) {
     button.addEventListener("click", () => {
         if (!calcError) {
@@ -31,28 +73,32 @@ for (let button of specialButtons) {
 }
 
 function checkSpecial(e) {
+    for (let char of specialChars) {
+        char = char.textContent;
+        if (e.target.textContent == char) {
+            evaluateChar(char)
+        }
+    } //return to the other function from here
+}
+
+function evaluateChar(char) {
     if (willOperate) {
         displayValue = ""
         special = "a"
         willOperate = false
     }
-    for (let char of specialChars) {
-        char = char.textContent;
-        if (e.target.textContent == char) {
-            special = "a";
-            if (special === "a") {
-                special = char;
-                console.log({ special })
-                if (special != "C" && special != "=" && !calcError) {
-                    storeData();
-                    changeDisplay();
-                } else if (special == "=" && !calcError) {
-                    storeData();
-                    changeDisplay();
+    special = "a";
+    if (special === "a") {
+        special = char;
+        console.log({ special })
+        if (special != "C" && special != "=" && !calcError) {
+            storeData();
+            changeDisplay();
+        } else if (special == "=" && !calcError) {
+            storeData();
+            changeDisplay();
 
-                } else clearData()
-            }
-        }
+        } else clearData()
     }
 }
 
