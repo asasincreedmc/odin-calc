@@ -11,17 +11,21 @@ let willOperate = ""
 let result = 0
 let placeholder = ""
 let wasCalculated = false
+let calcError = false
 for (let button of numberButtons) {
     button.addEventListener("click", () => {
-        if (willOperate) {
-            displayValue = ""
-            special = "a"
-            willOperate = false
+        if (!calcError) {
+            if (willOperate) {
+                displayValue = ""
+                special = "a"
+                willOperate = false
+            }
+            placeholder = button.textContent;
+            changeDisplay()
         }
-        placeholder = button.textContent;
-        changeDisplay()
     })
 }
+
 for (let button of specialButtons) {
     button.addEventListener("click", checkSpecial)
 }
@@ -39,10 +43,10 @@ function checkSpecial(e) {
             if (special === "a") {
                 special = char;
                 console.log({ special })
-                if (special != "C" && special != "=") {
+                if (special != "C" && special != "=" && !calcError) {
                     storeData();
                     changeDisplay();
-                } else if (special == "=") {
+                } else if (special == "=" && !calcError) {
                     storeData();
                     changeDisplay();
 
@@ -65,6 +69,7 @@ function clearData() {
         operator = "a"
         changeDisplay("C")
         wasCalculated = false
+        calcError = false
     } else {
         num1 = result
         operator = special;
@@ -89,9 +94,11 @@ function changeDisplay(clear = "") {
     } else if (clear == "C") {
         displayValue = ""
     } else displayValue += placeholder;
-
     console.log({ placeholder, displayValue })
-    displayText.textContent = Math.round(displayValue * 100000) / 100000;
+    if (displayValue == "Oops, can't divide by 0") {
+        displayText.textContent = displayValue
+        calcError = true
+    } else displayText.textContent = Math.round(displayValue * 100000) / 100000;
 
 }
 
