@@ -1,4 +1,5 @@
-const buttons = document.querySelectorAll(".button");
+const numberButtons = document.querySelectorAll(".number");
+const specialButtons = document.querySelectorAll(".special")
 const displayText = document.querySelector(".display");
 let displayValue = "";
 const specialChars = document.querySelectorAll(".special");
@@ -8,23 +9,36 @@ let special = "a"
 let operator = "a"
 let willOperate = ""
 let result = 0
-for (let button of buttons) {
+let placeholder = ""
+let wasCalculated = false
+for (let button of numberButtons) {
     button.addEventListener("click", () => {
         if (willOperate) {
-            displayText.textContent = "";
+            displayValue = ""
+            special = "a"
             willOperate = false
         }
-        displayText.textContent += button.textContent;
-        checkSpecial()
+        placeholder = button.textContent;
+        changeDisplay()
     })
 }
+for (let button of specialButtons) {
+    button.addEventListener("click", checkSpecial)
+}
 
-function checkSpecial() {
+function checkSpecial(e) {
+    if (willOperate) {
+        displayValue = ""
+        special = "a"
+        willOperate = false
+    }
     for (let char of specialChars) {
-        if (displayText.textContent.includes(`${char.textContent}`)) {
+        char = char.textContent;
+        if (e.target.textContent == char) {
             special = "a";
             if (special === "a") {
-                special = char.textContent;
+                special = char;
+                console.log({ special })
                 if (special != "C" && special != "=") {
                     storeData();
                     changeDisplay();
@@ -34,31 +48,13 @@ function checkSpecial() {
 
                 } else clearData()
             }
-
         }
     }
-}
-//make num2 on sotredata return calc() and store data so when + is selected again storedata will calculate and then erase all data except result = num1
-function changeDisplay(clear = "") {
-    if ((num2 !== "" && special != "C" && special != "=")) {
-        displayText.textContent = calculate();
-        console.log({ operator })
-        clearData()
-
-    } else if (special == "=") {
-        displayText.textContent = calculate();
-    } else if (special != "C" && special != "=") {
-        displayText.textContent = displayValue;
-    } else if (clear == "C") {
-        displayText.textContent = ""
-    } else displayText.textContent += EventTarget.textContent;
-    displayValue = displayText.textContent;
-
 }
 
 function calculate() {
     result = operate(+num1, operator, +num2)
-    console.log(num1, operator, num2, result)
+    console.log({ num1, operator, num2 })
     return result;
 }
 
@@ -68,24 +64,49 @@ function clearData() {
         willOperate = ""
         operator = "a"
         changeDisplay("C")
+        wasCalculated = false
     } else {
         num1 = result
-        willOperate = "true"
-        operator = special
+        operator = special;
+        if (operator != "=") {
+            willOperate = "true"
+        }
     }
     num2 = "";
-    special = "a"
     result = 0
 }
 
+function changeDisplay(clear = "") {
+    if ((num2 !== "" && special != "C" && special != "=" && special != "a")) {
+        displayValue = calculate();
+        clearData()
+    } else if (special == "=") {
+        displayValue = calculate();
+        clearData()
+        wasCalculated = true
+    } else if (special != "C" && special != "=" && special != "a") {
+        displayText.textContent = displayValue;
+    } else if (clear == "C") {
+        displayValue = ""
+    } else displayValue += placeholder;
+
+    console.log({ placeholder, displayValue })
+    displayText.textContent = Math.round(displayValue * 100000) / 100000;
+
+}
+
 function storeData() {
-    displayValue = displayText.textContent.slice(0, -1);
     if (num1 === "") {
         num1 = displayValue
         operator = special;
         willOperate = true
+        placeholder = 0;
     } else if (num2 === "") {
-        num2 = displayValue
+        if (wasCalculated) {
+            wasCalculated = false
+            operator = special
+            willOperate = true
+        } else num2 = displayValue
     } else {
         changeDisplay()
     }
