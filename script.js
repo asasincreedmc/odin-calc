@@ -78,7 +78,7 @@ function checkSpecial(e) {
         if (e.target.textContent == char) {
             evaluateChar(char)
         }
-    } //return to the other function from here
+    }
 }
 
 function evaluateChar(char) {
@@ -95,17 +95,20 @@ function evaluateChar(char) {
             storeData();
             changeDisplay();
         } else if (special == "=" && !calcError) {
-            storeData();
-            changeDisplay();
-
+            if (operator != "a" && num1 != "a" && num2 == "") {
+                storeData();
+                changeDisplay();
+            }
         } else clearData()
     }
 }
 
 function calculate() {
-    result = operate(+num1, operator, +num2)
-    console.log({ num1, operator, num2 })
-    return result;
+    if (operator != "=") {
+        result = operate(+num1, operator, +num2)
+        console.log({ num1, operator, num2 })
+        return result;
+    }
 }
 
 function clearData() {
@@ -118,10 +121,11 @@ function clearData() {
         calcError = false
     } else {
         num1 = result
-        operator = special;
-        if (operator != "=") {
+        if (special != "=") {
+            operator = special;
             willOperate = "true"
         }
+
     }
     num2 = "";
     result = 0
@@ -140,11 +144,14 @@ function changeDisplay(clear = "") {
     } else if (clear == "C") {
         displayValue = ""
     } else displayValue += placeholder;
-    console.log({ placeholder, displayValue })
+    console.log({ placeholder, displayValue, num1, operator, num2 })
     if (displayValue == "Oops, can't divide by 0") {
         displayText.textContent = displayValue
         calcError = true
-    } else displayText.textContent = Math.round(displayValue * 100000) / 100000;
+    } else if (!(isNaN(Math.round(displayValue)))) {
+        displayText.textContent = Math.round(displayValue * 100000) / 100000;
+    }
+
 
 }
 
@@ -154,10 +161,9 @@ function storeData() {
         operator = special;
         willOperate = true
         placeholder = 0;
-    } else if (num2 === "") {
-        if (wasCalculated) {
+    } else if (num2 == "") {
+        if (wasCalculated) {//always true
             wasCalculated = false
-            operator = special
             willOperate = true
         } else num2 = displayValue
     } else {
